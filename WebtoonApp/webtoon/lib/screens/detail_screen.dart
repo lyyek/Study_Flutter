@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webtoon/models/webtoon_detail_model.dart';
 import 'package:webtoon/models/webtoon_episode_model.dart';
 import 'package:webtoon/services/api_service.dart';
@@ -22,6 +20,25 @@ class _DetailScreenState extends State<DetailScreen> {
   //생성자에서 초기화가 어려울 경우 함수(initstate)로 초기화
   late Future<WebtoonDetailModel> webtoon;
   late Future<List<WebtoonEpisodeModel>> episodes;
+  late SharedPreferences prefs; //선호도
+  bool isLiked = false;
+
+  Future initPrefs() async {
+    prefs = await SharedPreferences.getInstance(); //폰에 접근
+    final likedToons =
+        prefs.getStringList('likedToons'); //likedtoons라는 리스트 있는지 확인
+    if (likedToons != null) {
+      //리스트 이미 있음 -> 해당 웹툰 id가 likedToons에 들어가있는지 확인
+      if (likedToons.contains(widget.id) == true) {
+        setState(() {
+          isLiked = true;
+        });
+      }
+    } else {
+      //리스트 생성
+      await prefs.setStringList('likedToons', []);
+    }
+  }
 
   @override
   void initState() {
@@ -31,6 +48,24 @@ class _DetailScreenState extends State<DetailScreen> {
     //초기화하기 위해서 id가 필요해서 이렇게 stateful로 바꿔서 진행한 것임
     webtoon = ApiService.getToonById(widget.id);
     episodes = ApiService.getLatestEpisodesById(widget.id);
+
+    initPrefs();
+  }
+
+  onHeartTap() async {
+    final likedToons = prefs.getStringList('likedToons');
+    if (likedToons != null) {
+      if (isLiked) {
+        ///아마 좋아한 상태인데 또 누름
+        likedToons.remove(widget.id); //하트 취소
+      } else {
+        likedToons.add(widget.id); //하트 추가
+      }
+      await prefs.setStringList('likedToons', likedToons); //폰에 저장
+      setState(() {
+        isLiked = !isLiked; //하트 아이콘 바꿔주기
+      });
+    }
   }
 
   @override
@@ -53,6 +88,14 @@ class _DetailScreenState extends State<DetailScreen> {
             fontWeight: FontWeight.w400,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: onHeartTap,
+            icon: Icon(
+              isLiked ? Icons.favorite : Icons.favorite_outline,
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
