@@ -30,7 +30,7 @@ class ApiService {
       //print(response.body);
       //string->json
       //이걸 dynamic List로 받아오기
-      final List<dynamic> webtoons = jsonDecode(response.body);
+      final List<dynamic> webtoons = jsonDecode(response.body); 
       for (var webtoon in webtoons) {
         //print(webtoon);
         //final toon = WebtoonModel.fromJson(webtoon);
