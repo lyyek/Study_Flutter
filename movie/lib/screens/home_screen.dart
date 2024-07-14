@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie/models/movie.dart';
+import 'package:movie/screens/detail_screen.dart';
 import 'package:movie/services/api_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -59,25 +60,41 @@ class HomeScreen extends StatelessWidget {
                       ),
                       itemBuilder: (context, index) {
                         var movie = snapshot.data![index];
-                        return Container(
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 15,
-                                offset: const Offset(0, 0),
-                                color: Colors.black.withOpacity(0.5),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                //route:stateless widget을 애니메이션 효과로 감싸서 스크린처럼 보이게 함
+                                builder: (context) => DetailScreen(
+                                    title: movie.title,
+                                    thumb: movie.thumb,
+                                    id: movie.id),
+                                fullscreenDialog:
+                                    true, //이미지가 바닥에서 올라오게함(설정 안하면 옆으로 처리됨)
                               ),
-                            ],
-                          ),
-                          child: Image.network(
-                            "https://image.tmdb.org/t/p/w500/${movie.thumb}",
-                            headers: const {
-                              'User-Agent':
-                                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-                              //'Referer': 'https://comic.naver.com',
-                            },
+                            );
+                          },
+                          child: Container(
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 0),
+                                  color: Colors.black.withOpacity(0.5),
+                                ),
+                              ],
+                            ),
+                            child: Image.network(
+                              "https://image.tmdb.org/t/p/w500/${movie.thumb}",
+                              headers: const {
+                                'User-Agent':
+                                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                                //'Referer': 'https://comic.naver.com',
+                              },
+                            ),
                           ),
                         );
                       },
@@ -104,7 +121,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 400,
+              height: 370,
               child: FutureBuilder(
                 future: releasedMovies,
                 builder: (context, snapshot) {
@@ -164,6 +181,17 @@ class HomeScreen extends StatelessWidget {
                     child: CircularProgressIndicator(),
                   );
                 },
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: Text(
+                "Coming soon",
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
