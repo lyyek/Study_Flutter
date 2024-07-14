@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movieflix/models/movie.dart';
 import 'package:movieflix/screens/home_screen.dart';
 import 'package:movieflix/services/api_service.dart';
 

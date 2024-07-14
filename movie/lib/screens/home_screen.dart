@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:movie/models/movie.dart';
 import 'package:movie/screens/detail_screen.dart';
 import 'package:movie/services/api_service.dart';
@@ -12,6 +13,9 @@ class HomeScreen extends StatelessWidget {
   //상영중인 영화 가져오기
   final Future<List<MovieModel>> releasedMovies =
       ApiService.getReleasedMovies();
+
+  final Future<List<MovieModel>> upcomingMovies =
+      ApiService.getUpcomingMovies();
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +39,9 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
               child: Text(
-                "Popular Movies",
+                "Popular Movies🔥",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w500,
@@ -46,7 +50,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 300,
+              height: 200,
               child: FutureBuilder(
                 future: popularMovies,
                 builder: (context, snapshot) {
@@ -55,8 +59,7 @@ class HomeScreen extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       itemCount: snapshot.data!.length,
                       padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
+                        horizontal: 10,
                       ),
                       itemBuilder: (context, index) {
                         var movie = snapshot.data![index];
@@ -78,7 +81,8 @@ class HomeScreen extends StatelessWidget {
                           child: Container(
                             clipBehavior: Clip.hardEdge,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
+                              shape: BoxShape.circle,
+                              //borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
                                   blurRadius: 15,
@@ -99,7 +103,7 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                       separatorBuilder: (context, index) => const SizedBox(
-                        width: 40,
+                        width: 10,
                       ),
                     );
                   }
@@ -110,9 +114,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
               child: Text(
-                "Now in Cinemas",
+                "Now in Cinemas🍿",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w500,
@@ -135,40 +139,54 @@ class HomeScreen extends StatelessWidget {
                       ),
                       itemBuilder: (context, index) {
                         var movie = snapshot.data![index];
-                        return Container(
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 15,
-                                offset: const Offset(0, 0),
-                                color: Colors.black.withOpacity(0.5),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailScreen(
+                                    title: movie.title,
+                                    thumb: movie.thumb,
+                                    id: movie.id),
+                                fullscreenDialog: true,
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Image.network(
-                                "https://image.tmdb.org/t/p/w500/${movie.thumb}",
-                                height: 300,
-                                headers: const {
-                                  'User-Agent':
-                                      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-                                },
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                movie.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
+                            );
+                          },
+                          child: Container(
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 0),
+                                  color: Colors.black.withOpacity(0.5),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Image.network(
+                                  "https://image.tmdb.org/t/p/w500/${movie.thumb}",
+                                  height: 300,
+                                  headers: const {
+                                    'User-Agent':
+                                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  movie.title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -186,12 +204,89 @@ class HomeScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               child: Text(
-                "Coming soon",
+                "Coming soon🏃",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
+              ),
+            ),
+            SizedBox(
+              height: 370,
+              child: FutureBuilder(
+                future: upcomingMovies,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data!.length,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      itemBuilder: (context, index) {
+                        var movie = snapshot.data![index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailScreen(
+                                    title: movie.title,
+                                    thumb: movie.thumb,
+                                    id: movie.id),
+                                fullscreenDialog: true,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 0),
+                                  color: Colors.black.withOpacity(0.5),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Image.network(
+                                  "https://image.tmdb.org/t/p/w500/${movie.thumb}",
+                                  height: 200,
+                                  headers: const {
+                                    'User-Agent':
+                                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  movie.title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const SizedBox(
+                        width: 40,
+                      ),
+                    );
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
               ),
             ),
           ],

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:movie/models/movie_detail.dart';
-import 'package:movie/services/api_service.dart';
+import 'package:movieflix/models/movie_detail.dart';
+import 'package:movieflix/services/api_service.dart';
 
 class DetailScreen extends StatefulWidget {
   final String title, thumb;
@@ -162,10 +162,11 @@ class _DetailScreenState extends State<DetailScreen> {
                                       snapshot.data!.about,
                                       textAlign: TextAlign.justify,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w400,
                                       ),
+                                      overflow: TextOverflow.visible,
                                     ),
                                   ),
                                 ),
